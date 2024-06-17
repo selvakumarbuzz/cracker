@@ -3,24 +3,23 @@ from django.shortcuts import render
 # Create your views here.
 from django.shortcuts import render
 from rest_framework.decorators import authentication_classes, permission_classes
-from .serializers import TemplateSerializer,CategorySerializer,ProductSerializer,BillingSerializer
+from .serializers import TemplateSerializer,CategorySerializer,ProductSerializer,BillingSerializer,RatingsSerializer
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
+from rest_framework import serializers
 from rest_framework.views import APIView
 from rest_framework import generics, mixins
 from rest_framework.decorators import api_view
+from rest_framework import status
 from rest_framework.response import Response
 # from django.http import Http404
 from django.shortcuts import get_object_or_404
 from api.mixins import (
     StaffEditorPermissionMixin,
     UserQuerySetMixin)
-from .models import Template,Category,Product,Billing
+from .models import Template,Category,Product,Billing,Ratings
 
-class TemplateCreate(
-
-
-    generics.ListCreateAPIView):
+class TemplateCreate(generics.ListCreateAPIView):
     queryset = Template.objects.all()
     serializer_class = TemplateSerializer
 
@@ -35,10 +34,7 @@ class TemplateCreate(
 
 template_list_create_view = TemplateCreate.as_view()
 
-class CategoryCreate(
-
-
-    generics.ListCreateAPIView):
+class CategoryCreate(generics.ListCreateAPIView):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
@@ -74,10 +70,7 @@ products_list_create_view = ProductListCreateAPIView.as_view()
 
 
 
-class BillingListCreateAPIView(
-
-
-    generics.ListCreateAPIView):
+class BillingListCreateAPIView(generics.ListCreateAPIView):
     queryset = Billing.objects.all()
     serializer_class = BillingSerializer
 
@@ -91,3 +84,28 @@ class BillingListCreateAPIView(
 
 
 billing_list_create_view = BillingListCreateAPIView.as_view()
+
+class RatingsListCreateAPIView(generics.ListCreateAPIView):
+    queryset = Ratings.objects.all()
+    serializer_class = RatingsSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = RatingsSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+    
+
+    def delete(self, request, *args, **kwargs):
+        try:
+            instance = self.get_object()
+            self.perform_destroy(instance)
+        except:
+            return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
+        return Response(status=status.HTTP_204_NO_CONTENT)
+    
+Ratings_list_create_view = RatingsListCreateAPIView.as_view()

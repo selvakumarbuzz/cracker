@@ -102,3 +102,15 @@ class Product(models.Model):
 
 
 
+
+
+
+class Ratings(models.Model):
+    Name  = models.CharField(max_length=255)
+    Rating = models.IntegerField()
+    Description = models.CharField(max_length=1000)
+
+
+    def __str__(self):
+        return self.Name
+
