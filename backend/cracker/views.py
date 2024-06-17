@@ -103,7 +103,7 @@ class RatingsListCreateAPIView(generics.ListCreateAPIView):
     def delete(self, request, *args, **kwargs):
         try:
             instance = self.get_object()
-            self.perform_destroy(instance)
+            instance.delete()
         except:
             return Response({"detail": "Not found."}, status=status.HTTP_404_NOT_FOUND)
         return Response(status=status.HTTP_204_NO_CONTENT)
